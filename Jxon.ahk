@@ -164,6 +164,7 @@ Jxon_Dump(obj, indent:="", lvl:=1)
 		Loop, % indent ? lvl : 0
 			indt .= indent
 
+		this_fn := this ? Func(A_ThisFunc).Bind(this) : A_ThisFunc
 		lvl += 1, out := "" ; Make #Warn happy
 		for k, v in obj
 		{
@@ -171,9 +172,9 @@ Jxon_Dump(obj, indent:="", lvl:=1)
 				throw Exception("Invalid object key.", -1, k ? Format("<Object at 0x{:p}>", &obj) : "<blank>")
 			
 			if !is_array
-				out .= ( ObjGetCapacity([k], 1) ? Jxon_Dump(k) : q . k . q ) ;// key
+				out .= ( ObjGetCapacity([k], 1) ? %this_fn%(k) : q . k . q ) ;// key
 				    .  ( indent ? ": " : ":" ) ; token + padding
-			out .= Jxon_Dump(v, indent, lvl) ; value
+			out .= %this_fn%(v, indent, lvl) ; value
 			    .  ( indent ? ",`n" . indt : "," ) ; token + indent
 		}
 
