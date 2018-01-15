@@ -146,6 +146,15 @@ Jxon_Dump(obj, indent:="", lvl:=1)
 		if Type ? (Type.Call(obj) != "Object") : (ObjGetCapacity(obj) == "")
 			throw Exception("Object type not supported.", -1, Format("<Object at 0x{:p}>", &obj))
 
+		prefix := SubStr(A_ThisFunc, 1, InStr(A_ThisFunc, ".",, 0))
+		fn_t := prefix "Jxon_True",  obj_t := this ? %fn_t%(this) : %fn_t%()
+		fn_f := prefix "Jxon_False", obj_f := this ? %fn_f%(this) : %fn_f%()
+
+		if (&obj == &obj_t)
+			return "true"
+		else if (&obj == &obj_f)
+			return "false"
+
 		is_array := 0
 		for k in obj
 			is_array := k == A_Index
@@ -210,4 +219,16 @@ Jxon_Dump(obj, indent:="", lvl:=1)
 	}
 	
 	return q . obj . q
+}
+
+Jxon_True()
+{
+	static obj := {}
+	return obj
+}
+
+Jxon_False()
+{
+	static obj := {}
+	return obj
 }
