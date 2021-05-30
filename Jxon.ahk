@@ -146,6 +146,15 @@ Jxon_Dump(obj, indent:="", lvl:=1)
 		if Type ? (Type.Call(obj) != "Object") : (ObjGetCapacity(obj) == "")
 			throw Exception("Object type not supported.", -1, Format("<Object at 0x{:p}>", &obj))
 
+		prefix := SubStr(A_ThisFunc, 1, InStr(A_ThisFunc, ".",, 0))
+		fn_t := prefix "Jxon_True",  obj_t := this ? %fn_t%(this) : %fn_t%()
+		fn_f := prefix "Jxon_False", obj_f := this ? %fn_f%(this) : %fn_f%()
+
+		if (&obj == &obj_t)
+			return "true"
+		else if (&obj == &obj_f)
+			return "false"
+
 		is_array := 0
 		for k in obj
 			is_array := k == A_Index
@@ -164,6 +173,7 @@ Jxon_Dump(obj, indent:="", lvl:=1)
 		Loop, % indent ? lvl : 0
 			indt .= indent
 
+		this_fn := this ? Func(A_ThisFunc).Bind(this) : A_ThisFunc
 		lvl += 1, out := "" ; Make #Warn happy
 		for k, v in obj
 		{
@@ -171,9 +181,9 @@ Jxon_Dump(obj, indent:="", lvl:=1)
 				throw Exception("Invalid object key.", -1, k ? Format("<Object at 0x{:p}>", &obj) : "<blank>")
 
 			if !is_array
-				out .= ( ObjGetCapacity([k], 1) ? Jxon_Dump(k) : q . k . q ) ;// key
+				out .= ( ObjGetCapacity([k], 1) ? %this_fn%(k) : q . k . q ) ;// key
 				    .  ( indent ? ": " : ":" ) ; token + padding
-			out .= Jxon_Dump(v, indent, lvl) ; value
+			out .= %this_fn%(v, indent, lvl) ; value
 			    .  ( indent ? ",`n" . indt : "," ) ; token + indent
 		}
 
@@ -209,4 +219,16 @@ Jxon_Dump(obj, indent:="", lvl:=1)
 	}
 
 	return q . obj . q
+}
+
+Jxon_True()
+{
+	static obj := {}
+	return obj
+}
+
+Jxon_False()
+{
+	static obj := {}
+	return obj
 }

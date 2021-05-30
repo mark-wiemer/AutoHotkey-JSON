@@ -254,7 +254,11 @@ class JSON
 			if (this.rep)
 				value := this.rep.Call(holder, key, ObjHasKey(holder, key) ? value : JSON.Undefined)
 
-			if IsObject(value) {
+			if (&value == &JSON.True) {
+				return "true"
+			} else if (&value == &JSON.False) {
+				return "false"
+			} else if IsObject(value) {
 			; Check object type, skip serialization for other object types such as
 			; ComObject, Func, BoundFunc, FileObject, RegExMatchObject, Property, etc.
 				static type := A_AhkVersion<"2" ? "" : Func("Type")
@@ -356,6 +360,36 @@ class JSON
 			static empty := {}, vt_empty := ComObject(0, &empty, 1)
 			return vt_empty
 		}
+	}
+
+	/**
+	 * Property: True
+	 *     Proxy for 'true' type
+	 * Syntax:
+	 *     true := JSON.True
+	 * Remarks:
+	 *     For use with JSON.Dump since AutoHotkey does not have real boolean types.
+	 *     Using True/1 won't work since it can't be distinguished from the
+	 *     integer value 1. When JSON.True is used, JSON.Dump will generate the
+	 *     bare text 'true' instead of the integer 1 or the string "true".
+	 */
+	class True
+	{
+	}
+
+	/**
+	 * Property: False
+	 *     Proxy for 'false' type
+	 * Syntax:
+	 *     false := JSON.False
+	 * Remarks:
+	 *     For use with JSON.Dump since AutoHotkey does not have real boolean types.
+	 *     Using False/0 won't work since it can't be distinguished from the
+	 *     integer value 0. When JSON.False is used, JSON.Dump will generate the
+	 *     bare text 'false' instead of the integer 0 or the string "false".
+	 */
+	class False
+	{
 	}
 
 	class Functor
